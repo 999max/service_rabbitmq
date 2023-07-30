@@ -1,5 +1,6 @@
 const amqp = require('amqplib');
 const axios = require('axios');
+const logger = require('./logger');
 require('dotenv').config();
 
 const RABBIT_URL = process.env.RABBIT_URL;
@@ -30,7 +31,7 @@ async function getWeather() {
     channel.ack(msg);
   });
 
-  console.log('Weather service ready for requests...');
+  logger.info('[Weather] service started');
 }
 
 async function fetchWeather(lat, lon) {
@@ -43,10 +44,11 @@ async function fetchWeather(lat, lon) {
   
   try {
     const response = await axios.get(url, config);
+    logger.info(`[Weather] Success response ${response} for lat: ${lat}, lon: ${lon}`)
     return JSON.stringify(response.data.fact.temp);
   } catch (e) {
-    console.log("ERROR");
-    return "Error ocurred. Check API key or try again later";
+    logger.error(`[Weather] Error in fetching weather: ${e}`);
+    return "Error";
   }
 }
 

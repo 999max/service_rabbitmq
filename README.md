@@ -28,3 +28,7 @@ Now we can test it by sending request
 ```
 $ curl http://localhost:{PORT}/cities/astana
 ```
+
+
+#### Todo
+- [ ] Move logic from server.js to controller.
