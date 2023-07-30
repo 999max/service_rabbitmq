@@ -1,5 +1,6 @@
 const express = require('express');
 const amqp = require('amqplib');
+const logger = require('./logger');
 const cities = require('./db/cities.json')
 require('dotenv').config();
 
@@ -7,29 +8,39 @@ const app = express();
 const PORT = process.env.PORT || 5005;
 const RABBIT_URL = process.env.RABBIT_URL;
 
-function generateUuid() {
-  return Math.random().toString()
-}
 
 app.get('/cities', (req, res) => {
   res.send(cities);
 });
 
 app.get('/cities/:city', async (req, res) => {
-  const reqCity = req.params.city.toLowerCase();
+  const reqCity = req.params.city;
   
   const city = cities.find((city) => {
-    return city.name.toLowerCase() === reqCity;
+    return city.name.toLowerCase() === reqCity.toLowerCase();
   })
 
   if (!city) {
     res.status(404).send("Error: City not found.");
+    logger.error(`Requested city '${reqCity}' not found in db`);
   } else{
-    const weather = await requestWeather(city.lat, city.lon);
-    res.send(weather);
-  }
-});
+    try {
+      const weather = await requestWeather(city.lat, city.lon);
+        if (weather != 'Error') {
+          res.send(weather);
+          logger.info(`Success response '${weather}' for lat: ${city.lat}, lon: ${city.log}`);
+        } else {
+          res.send('Error during handling request. Try again later.');
+          logger.error(`Internal error for lat: ${city.lat}, lon: ${city.lon}`);
+        }
 
+    } catch (e) {
+      res.status(500).send("Internal error. Try again later");
+      logger.error(`Error in weather service. city: ${city.name}, lat: ${city.lat}, lon: ${city.lon}`);
+    }
+  }
+
+});
 
 async function requestWeather(lat, lon) {
   const connection = await amqp.connect(RABBIT_URL);
@@ -64,4 +75,8 @@ async function requestWeather(lat, lon) {
   return result;
 }
 
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+function generateUuid() {
+  return Math.random().toString()
+}
+
+app.listen(PORT, () => logger.info(`Server started on port ${PORT}`));
