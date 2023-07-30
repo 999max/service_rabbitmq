@@ -1,3 +1,9 @@
+# Weather service  
+The project allows to get the current temperature in the requested city.
+
+This is a simple project that demonstrates how to use RabbitMQ. 
+To simplify, a file with cities and their coordinates was used instead of a database.
+
 
 ## How to run
 
@@ -20,7 +26,7 @@ node server.js
 
 4. Run service:  
 ```sh
-node wether.js
+node weather.js
 ```
 
 ## Testing

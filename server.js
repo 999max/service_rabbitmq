@@ -28,7 +28,7 @@ app.get('/cities/:city', async (req, res) => {
       const weather = await requestWeather(city.lat, city.lon);
         if (weather != 'Error') {
           res.send(weather);
-          logger.info(`Success response '${weather}' for lat: ${city.lat}, lon: ${city.log}`);
+          logger.info(`Success response '${weather}' for lat: ${city.lat}, lon: ${city.lon}`);
         } else {
           res.send('Error during handling request. Try again later.');
           logger.error(`Internal error for lat: ${city.lat}, lon: ${city.lon}`);
@@ -54,7 +54,6 @@ async function requestWeather(lat, lon) {
       queue,
       (msg) => {
         if (msg.properties.correlationId === correlationId) {
-          console.log(msg.content.toString());
           resolve(msg.content.toString());
         }
       },

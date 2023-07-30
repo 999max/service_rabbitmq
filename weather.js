@@ -5,7 +5,6 @@ require('dotenv').config();
 
 const RABBIT_URL = process.env.RABBIT_URL;
 const YANDEX_API_KEY = process.env.YANDEX_API_KEY;
-console.log(YANDEX_API_KEY)
 
 
 async function getWeather() {
